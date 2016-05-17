@@ -23,5 +23,7 @@ object MainObj {
         println(model(n1))
         val delta = res(n1) delta model(n1)
         println("max delta=" + delta)
+        val delta2 = res(n1 - 1) delta res(n1 - 2)
+        println("max delta2=" + delta2)
     }
 }

@@ -19,14 +19,14 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
                                    tBorder: NodeFunction1,
                                    bBorder: NodeFunction1) {
 
-    val eps = 1e-2
+    val eps = 1e-6
 
     private def calcCoefficients(L: Int,
                                  a: IntToDouble,
                                  b: IntToDouble,
                                  c: IntToDouble,
                                  d: IntToDouble): Array[Array[Double]] = {
-        val coefficients = Array.ofDim[Double](L + 1, 2)
+        val coefficients = Array.ofDim[Double](L, 2)
         coefficients(1)(0) = -a(1) / b(1)
         coefficients(1)(1) = d(1) / b(1)
         for(i <- 2 until L) {
@@ -70,7 +70,7 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
         var oldlayer: CompulationGrid.Layer = null
         do {
             oldlayer = layer
-            for(m <- 1 until M) {
+            for(m <- M - 1 to 1 by -1) {
                 val coefficients = calcCoefficients(L,
                     a1(m, alayer.apply, oldlayer.apply),
                     b1(m, alayer.apply, oldlayer.apply),
@@ -82,7 +82,7 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
                 }
             }
             layer = getLayerWithBorderCondition(n)
-            for(l <- 1 until L) {
+            for(l <- L - 1 to 1 by -1) {
                 val coefficients = calcCoefficients(M,
                     a2(l, oldlayer.apply, bufLayer.apply),
                     b2(l, oldlayer.apply, bufLayer.apply),
