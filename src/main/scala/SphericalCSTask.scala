@@ -41,11 +41,11 @@ class SphericalCSTask(val Mu: Double, val Ct: Double, val L: Int, val M: Int, va
 
     def lBorder(n: Int, l: Int, m: Int):Double = 0
     def rBorder(n: Int, l: Int, m: Int):Double = {
-        math.pow(math.cos(tetam(m)) * math.cos(tetam(m)) / (Ct - 2 * (Mu + 2) * tau * n / Mu), 1.0 / Mu)
+        math.pow(math.cos(tetam(m)), 2.0 / Mu) * math.pow(Ct - 2 * (Mu + 2) * tau * n / Mu, -1.0 / Mu)
     }
 
     def bBorder(n: Int, l: Int, m: Int): Double = {
-        math.pow(rl(l) * rl(l) / (Ct - 2.0 * (Mu + 2) * tau * n / Mu), 1.0 / Mu)
+        math.pow(rl(l), 2.0 / Mu) * math.pow(Ct - 2.0 * (Mu + 2) * tau * n / Mu, -1.0 / Mu)
     }
 
     def tBorder(n: Int, l: Int, m: Int): Double = 0

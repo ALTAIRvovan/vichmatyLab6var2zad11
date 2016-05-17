@@ -25,13 +25,30 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
                                  a: IntToDouble,
                                  b: IntToDouble,
                                  c: IntToDouble,
-                                 d: IntToDouble): Array[Array[Double]] = {
+                                 d: IntToDouble,
+                                 U0: Double): Array[Array[Double]] = {
         val coefficients = Array.ofDim[Double](L, 2)
         coefficients(1)(0) = -a(1) / b(1)
-        coefficients(1)(1) = d(1) / b(1)
+        coefficients(1)(1) = (d(1) - c(1) * U0) / b(1)
         for(i <- 2 until L) {
             coefficients(i)(0) = - a(i) / (b(i) + c(i) * coefficients(i - 1)(0))
             coefficients(i)(1) = (d(i) - c(i) * coefficients(i - 1)(1)) / (b(i) + c(i) * coefficients(i - 1)(0))
+        }
+        coefficients
+    }
+
+    private def calcCoefficients1(L: Int,
+                                  a: IntToDouble,
+                                  b: IntToDouble,
+                                  c: IntToDouble,
+                                  d: IntToDouble,
+                                  UL: Double): Array[Array[Double]] = {
+        val coefficients = Array.ofDim[Double](L, 2)
+        coefficients(L - 1)(0) = -c(L - 1) / b(L - 1)
+        coefficients(L - 1)(1) = (d(L - 1) - c(L - 1) * UL) / b( L - 1)
+        for(i <- L - 2 to 1 by -1) {
+            coefficients(i)(0) = - a(i) / (b(i) + c(i) * coefficients(i + 1)(0))
+            coefficients(i)(1) = (d(i) - c(i) * coefficients(i + 1)(1)) / (b(i) + c(i) * coefficients(i + 1)(0))
         }
         coefficients
     }
@@ -75,7 +92,8 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
                     a1(m, alayer.apply, oldlayer.apply),
                     b1(m, alayer.apply, oldlayer.apply),
                     c1(m, alayer.apply, oldlayer.apply),
-                    d1(m, alayer.apply, oldlayer.apply)
+                    d1(m, alayer.apply, oldlayer.apply),
+                    bufLayer(0, m)
                 )
                 for (l <- L - 1 to 1 by -1) {
                     bufLayer.set(l, m, coefficients(l)(0) * bufLayer(l + 1, m) + coefficients(l)(1))
@@ -83,14 +101,15 @@ class TridiagonalMatrixAlgorithm2D(L: Int, M:Int,
             }
             layer = getLayerWithBorderCondition(n)
             for(l <- L - 1 to 1 by -1) {
-                val coefficients = calcCoefficients(M,
+                val coefficients = calcCoefficients1(M,
                     a2(l, oldlayer.apply, bufLayer.apply),
                     b2(l, oldlayer.apply, bufLayer.apply),
                     c2(l, oldlayer.apply, bufLayer.apply),
-                    d2(l, oldlayer.apply, bufLayer.apply)
+                    d2(l, oldlayer.apply, bufLayer.apply),
+                    layer(l, M)
                 )
-                for (m <- M - 1 to 1 by -1) {
-                    layer.set(l, m, coefficients(m)(0) * layer(l, m + 1) + coefficients(m)(1))
+                for (m <- 1 until M) {
+                    layer.set(l, m, coefficients(m)(0) * layer(l, m - 1) + coefficients(m)(1))
                 }
             }
         } while(!check(layer, oldlayer))

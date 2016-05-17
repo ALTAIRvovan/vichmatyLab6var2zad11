@@ -10,20 +10,18 @@
 
 object MainObj {
     def main(args: Array[String]): Unit = {
-        val L = 5
-        val M = 5
-        val N = 5
+        val L = 50
+        val M = 50
+        val N = 50
         val n1 = N
         val tast = new SphericalCSTask(1, 7, L , M, N)
-        val res = tast solve()
-        println("numerical")
-        println(res(n1))
         val model = tast model()
         println("analitical")
         println(model(n1))
+        val res = tast solve()
+        println("numerical")
+        println(res(n1))
         val delta = res(n1) delta model(n1)
         println("max delta=" + delta)
-        val delta2 = res(n1 - 1) delta res(n1 - 2)
-        println("max delta2=" + delta2)
     }
 }
