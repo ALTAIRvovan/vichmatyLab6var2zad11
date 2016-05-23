@@ -21,6 +21,9 @@ class CompulationGrid(val L: Int, val M: Int, val N: Int) {
     }
     def apply(n: Int): Layer = grid(n)
     def set(n: Int, layer: Layer) = {
+        if(N > 1000) {
+            clearOld(n)
+        }
         grid(n) = layer
     }
 
@@ -29,6 +32,16 @@ class CompulationGrid(val L: Int, val M: Int, val N: Int) {
             grid(n) = new Layer(L, M)
         }
         grid(n).set(l, m, value)
+    }
+
+    def clearOld(n : Int): Unit = {
+        if( n > 3) {
+            var n1:Int = n - 2
+            while(n1 > 0 && grid(n1) != null) {
+                grid(n1) = null
+                n1 -= 1
+            }
+        }
     }
 }
 
@@ -129,6 +142,32 @@ object CompulationGrid {
                     max = v
             }
             max
+        }
+
+        def subAbs(layer: Layer): Layer = {
+            require(hr > 0 && ht > 0)
+            val res = new Layer(L, M)
+            for(i <- 0 to L; j <- 0 to M) {
+                res.set(i, j, math.abs(apply(i, j) - layer(i, j)))
+            }
+            res.setSteps(hr, ht, tau)
+            res
+        }
+
+        def average(layer: Layer): Unit = {
+            require(L == layer.L && M == layer.M)
+            for(l <- 0 to L; m <- 0 to M) {
+                set(l, m, (apply(l, m) + layer(l, m)) / 2)
+            }
+        }
+
+        def average(layer: Layer, layer2: Layer, layer3: Layer): Unit = {
+            require(L == layer.L  && M == layer.M )
+            require(L == layer2.L && M == layer2.M)
+            require(L == layer3.L && M == layer3.M)
+            for(l <- 0 to L; m <- 0 to M) {
+                set(l, m, (apply(l, m) + layer(l, m) + layer2(l, m) + layer3(l, m)) / 4)
+            }
         }
     }
 }
